@@ -74,7 +74,7 @@ public class MashupService {
         return model;
     }
 
-    private static String checkDirectWikipediaLink(MusicBrainzResponse musicBrainzResponse) {
+    protected static String checkDirectWikipediaLink(MusicBrainzResponse musicBrainzResponse) {
         Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
                 .stream()
                 .filter(relation -> relation.getType().equals("wikipedia"))
@@ -83,7 +83,7 @@ public class MashupService {
         return wikidataRelation.map(MashupService::parseIdentifierFromUrl).orElse(null);
     }
 
-    private static String extractWikidataId(MusicBrainzResponse musicBrainzResponse) {
+    protected static String extractWikidataId(MusicBrainzResponse musicBrainzResponse) {
         Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
                 .stream()
                 .filter(relation -> relation.getType().equals("wikidata"))
@@ -108,7 +108,11 @@ public class MashupService {
         }
     }
 
-    private List<Album> extractAlbums(MusicBrainzResponse musicBrainzResponse) {
+    protected List<Album> extractAlbums(MusicBrainzResponse musicBrainzResponse) {
+        if (musicBrainzResponse.getReleaseGroups().isEmpty()) {
+            return null;
+        }
+
         List<Album> albums = musicBrainzResponse.getReleaseGroups()
                 .stream()
                 .map(r -> new Album(r.getId(), r.getTitle(), null))
@@ -117,7 +121,7 @@ public class MashupService {
         return addImageUrlsToAlbums(albums);
     }
 
-    private List<Album> addImageUrlsToAlbums(List<Album> albums) {
+    protected List<Album> addImageUrlsToAlbums(List<Album> albums) {
         return albums
                 .stream()
                 .map(album -> {
@@ -135,7 +139,7 @@ public class MashupService {
                 }).collect(Collectors.toList());
     }
 
-    private static String parseIdentifierFromUrl(Relation relation) {
+    protected static String parseIdentifierFromUrl(Relation relation) {
         /*
         * The unique identifier for wikidata lookup and the wikipedia full name to article is parsed
         * from the relations sections in musicbrainz answer from a url as the second element when splitting on "/wiki/"

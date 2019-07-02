@@ -1,6 +1,6 @@
 package com.example.cygnimashup.model.musicbrainz;
 
-public class WikidataUrl {
+public class Url {
     private String resource;
 
     public String getResource() {

@@ -2,7 +2,7 @@ package com.example.cygnimashup.model.musicbrainz;
 
 public class Relation {
     private String type;
-    private WikidataUrl url;
+    private Url url;
 
     public String getType() {
         return type;
@@ -12,11 +12,11 @@ public class Relation {
         this.type = type;
     }
 
-    public WikidataUrl getUrl() {
+    public Url getUrl() {
         return url;
     }
 
-    public void setUrl(WikidataUrl url) {
+    public void setUrl(Url url) {
         this.url = url;
     }
 }
