@@ -1,6 +1,6 @@
 
-# Created by https://www.gitignore.io/api/java,java-web,intellij+all
-# Edit at https://www.gitignore.io/?templates=java,java-web,intellij+all
+# Created by https://www.gitignore.io/api/java,maven,java-web,intellij+all
+# Edit at https://www.gitignore.io/?templates=java,maven,java-web,intellij+all
 
 ### Intellij+all ###
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
@@ -117,4 +117,15 @@ hs_err_pid*
 ## ignoring target file
 target/
 
-# End of https://www.gitignore.io/api/java,java-web,intellij+all
+### Maven ###
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# End of https://www.gitignore.io/api/java,maven,java-web,intellij+all
