@@ -31,4 +31,13 @@ public class Mashup {
     public void setAlbums(List<Album> albums) {
         this.albums = albums;
     }
+
+    @Override
+    public String toString() {
+        return "Mashup{" +
+                "mbid='" + mbid + '\'' +
+                ", description='" + description + '\'' +
+                ", albums=" + albums +
+                '}';
+    }
 }

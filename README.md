@@ -22,7 +22,7 @@ Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/
 mvn spring-boot:run
 ```
 
-HTTP debug logs are enabled in dev profile. `-Dspring.profiles.active=dev`
+VM Options `dev` profile for debug logs `-Dspring.profiles.active=dev`
 
 ## Example usage
 

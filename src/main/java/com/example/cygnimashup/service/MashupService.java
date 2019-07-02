@@ -11,6 +11,8 @@ import com.example.cygnimashup.model.musicbrainz.MusicBrainzResponse;
 import com.example.cygnimashup.model.musicbrainz.Relation;
 import com.example.cygnimashup.model.wikidata.WikidataResponse;
 import com.example.cygnimashup.model.wikipedia.WikipediaResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,12 +24,11 @@ import java.util.stream.Collectors;
 @Service
 public class MashupService {
 
+    private static final Logger logger = LoggerFactory.getLogger(MashupService.class);
+
     private final MusicBrainzDao musicBrainzDao;
-
     private final CoverArtDao coverArtDao;
-
     private final WikipediaDao wikipediaDao;
-
     private final WikidataDao wikidataDao;
 
     @Autowired
@@ -67,6 +68,8 @@ public class MashupService {
         WikipediaResponse wikipediaResponse = wikipediaDao.getDescription(directWikipediaLinkToArtist == null ? artist : directWikipediaLinkToArtist);
         String description = extractWikipediaDescription(wikipediaResponse);
         model.setDescription(description);
+
+        logger.debug(model.toString());
 
         return model;
     }
