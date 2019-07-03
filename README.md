@@ -1,4 +1,4 @@
-## Musicbrainz webservice aggregator
+## Musicbrainz webservice
 
 Spring Boot REST Service.
 
