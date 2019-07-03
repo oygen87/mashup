@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.cygnimashup.service.MashupService.WIKIDATA;
+import static com.example.cygnimashup.service.MashupService.WIKIPEDIA;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +131,7 @@ public class MashupServiceTest {
     }
 
     @Test
-    public void shouldFindDirectWikipediaLink() {
+    public void shouldFindDirectWikipediaLinkAndIdentifier() {
         List<Relation> relations = new ArrayList<>();
 
         Relation relation1 = new Relation();
@@ -145,7 +147,7 @@ public class MashupServiceTest {
         relation2.setUrl(url2);
 
         Relation relation3 = new Relation();
-        relation3.setType("wikipedia");
+        relation3.setType(WIKIPEDIA);
         Url url3 = new Url();
         url3.setResource("https://en.wikipedia.org/wiki/The_Beatles");
         relation3.setUrl(url3);
@@ -191,7 +193,7 @@ public class MashupServiceTest {
     }
 
     @Test
-    public void shouldExtractWikidataId() {
+    public void shouldGetWikidataIdentifier() {
         List<Relation> relations = new ArrayList<>();
 
         Relation relation1 = new Relation();
@@ -201,7 +203,7 @@ public class MashupServiceTest {
         relation1.setUrl(url1);
 
         Relation relation2 = new Relation();
-        relation2.setType("wikidata");
+        relation2.setType(WIKIDATA);
         Url url2 = new Url();
         url2.setResource("https://www.wikidata.org/wiki/Q370293");
         relation2.setUrl(url2);
@@ -212,7 +214,7 @@ public class MashupServiceTest {
         MusicBrainzResponse musicBrainzResponse = new MusicBrainzResponse();
         musicBrainzResponse.setRelations(relations);
 
-        String result = MashupService.extractWikidataId(musicBrainzResponse);
+        String result = MashupService.getIdentifier(musicBrainzResponse, WIKIDATA);
         String expected = "Q370293";
 
         assertEquals(expected, result);

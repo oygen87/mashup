@@ -17,13 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Null;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class MashupService {
+
+    static String WIKIPEDIA = "wikipedia";
+    static String WIKIDATA = "wikidata";
 
     private static final Logger logger = LoggerFactory.getLogger(MashupService.class);
 
@@ -54,13 +56,13 @@ public class MashupService {
         List<Album> albums = extractAlbums(musicBrainzResponse);
         model.setAlbums(albums);
 
-        // Check if there is direct link to Wikipedia
+        // Check if there is direct link with identifier to Wikipedia
         String directWikipediaLinkToArtist = checkDirectWikipediaLink(musicBrainzResponse);
 
         // Otherwise query Wikidata for full artist name identifier
         String artist = null;
         if (directWikipediaLinkToArtist == null) {
-            String wikidataId = extractWikidataId(musicBrainzResponse);
+            String wikidataId = getIdentifier(musicBrainzResponse, WIKIDATA);
             WikidataResponse wikidataResponse = wikidataDao.getWikiData(wikidataId);
             artist = extractArtistName(wikidataResponse, wikidataId);
         }
@@ -76,19 +78,14 @@ public class MashupService {
     }
 
     static String checkDirectWikipediaLink(MusicBrainzResponse musicBrainzResponse) {
-        Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
-                .stream()
-                .filter(relation -> relation.getType().equals("wikipedia"))
-                .findFirst();
-
-        return wikidataRelation.map(MashupService::parseIdentifierFromUrl).orElse(null);
+        return getIdentifier(musicBrainzResponse, WIKIPEDIA);
     }
 
-    static String extractWikidataId(MusicBrainzResponse musicBrainzResponse) {
+    static String getIdentifier(MusicBrainzResponse musicBrainzResponse, String relationSource) {
         try {
             Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
                     .stream()
-                    .filter(relation -> relation.getType().equals("wikidata"))
+                    .filter(relation -> relation.getType().equals(relationSource))
                     .findFirst();
 
             return wikidataRelation.map(MashupService::parseIdentifierFromUrl).orElse(null);

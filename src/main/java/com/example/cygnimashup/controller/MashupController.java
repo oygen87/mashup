@@ -3,7 +3,6 @@ package com.example.cygnimashup.controller;
 import com.example.cygnimashup.model.Mashup;
 import com.example.cygnimashup.service.MashupService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

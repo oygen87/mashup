@@ -7,6 +7,12 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class WikipediaDao {
 
+    /**
+     * Returns Description (wrapped in model) about an artist from Wikipedia.
+     *
+     * @param artist
+     * @return {@link com.example.cygnimashup.model.wikipedia.WikipediaResponse}
+     */
     public WikipediaResponse getDescription(String artist) {
         RestTemplate restTemplate = new RestTemplate();
         try {
