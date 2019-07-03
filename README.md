@@ -22,7 +22,7 @@ Alternatively you can use the [Spring Boot Maven plugin](https://docs.spring.io/
 mvn spring-boot:run
 ```
 
-VM Options `dev` profile for debug logs `-Dspring.profiles.active=dev`
+Use `dev` profile for debug logs `-Dspring.profiles.active=dev` in VM Options
 
 ## Example usage
 
