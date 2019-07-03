@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.Null;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,7 +49,6 @@ public class MashupService {
 
         // Get artist information and album releases
         MusicBrainzResponse musicBrainzResponse = musicBrainzDao.getArtistInfo(mbid);
-        String wikidataId = extractWikidataId(musicBrainzResponse);
 
         // Extract albums from musicbrainz response and add cover art
         List<Album> albums = extractAlbums(musicBrainzResponse);
@@ -60,6 +60,7 @@ public class MashupService {
         // Otherwise query Wikidata for full artist name identifier
         String artist = null;
         if (directWikipediaLinkToArtist == null) {
+            String wikidataId = extractWikidataId(musicBrainzResponse);
             WikidataResponse wikidataResponse = wikidataDao.getWikiData(wikidataId);
             artist = extractArtistName(wikidataResponse, wikidataId);
         }
@@ -74,7 +75,7 @@ public class MashupService {
         return model;
     }
 
-    protected static String checkDirectWikipediaLink(MusicBrainzResponse musicBrainzResponse) {
+    static String checkDirectWikipediaLink(MusicBrainzResponse musicBrainzResponse) {
         Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
                 .stream()
                 .filter(relation -> relation.getType().equals("wikipedia"))
@@ -83,32 +84,36 @@ public class MashupService {
         return wikidataRelation.map(MashupService::parseIdentifierFromUrl).orElse(null);
     }
 
-    protected static String extractWikidataId(MusicBrainzResponse musicBrainzResponse) {
-        Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
-                .stream()
-                .filter(relation -> relation.getType().equals("wikidata"))
-                .findFirst();
+    static String extractWikidataId(MusicBrainzResponse musicBrainzResponse) {
+        try {
+            Optional<Relation> wikidataRelation = musicBrainzResponse.getRelations()
+                    .stream()
+                    .filter(relation -> relation.getType().equals("wikidata"))
+                    .findFirst();
 
-        return wikidataRelation.map(MashupService::parseIdentifierFromUrl).orElse(null);
+            return wikidataRelation.map(MashupService::parseIdentifierFromUrl).orElse(null);
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
 
-    private static String extractWikipediaDescription(WikipediaResponse wikipediaResponse) {
+    static String extractWikipediaDescription(WikipediaResponse wikipediaResponse) {
         try {
             return wikipediaResponse.getQuery().getPages().entrySet().iterator().next().getValue().getExtract();
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             return null;
         }
     }
 
-    private static String extractArtistName(WikidataResponse wikidataResponse, String id) {
+    static String extractArtistName(WikidataResponse wikidataResponse, String id) {
         try {
             return wikidataResponse.getEntities().get(id).getSitelinks().getEnwiki().getTitle();
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
             return null;
         }
     }
 
-    protected List<Album> extractAlbums(MusicBrainzResponse musicBrainzResponse) {
+    List<Album> extractAlbums(MusicBrainzResponse musicBrainzResponse) {
         if (musicBrainzResponse.getReleaseGroups().isEmpty()) {
             return null;
         }
@@ -121,7 +126,7 @@ public class MashupService {
         return addImageUrlsToAlbums(albums);
     }
 
-    protected List<Album> addImageUrlsToAlbums(List<Album> albums) {
+    List<Album> addImageUrlsToAlbums(List<Album> albums) {
         return albums
                 .stream()
                 .map(album -> {
@@ -139,7 +144,7 @@ public class MashupService {
                 }).collect(Collectors.toList());
     }
 
-    protected static String parseIdentifierFromUrl(Relation relation) {
+    static String parseIdentifierFromUrl(Relation relation) {
         /*
         * The unique identifier for wikidata lookup and the wikipedia full name to article is parsed
         * from the relations sections in musicbrainz answer from a url as the second element when splitting on "/wiki/"

@@ -9,8 +9,12 @@ public class WikipediaDao {
 
     public WikipediaResponse getDescription(String artist) {
         RestTemplate restTemplate = new RestTemplate();
-        return restTemplate
-                .getForEntity("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=true&redirects=true&titles={artist}", WikipediaResponse.class, artist)
-                .getBody();
+        try {
+            return restTemplate
+                    .getForEntity("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=true&redirects=true&titles={artist}", WikipediaResponse.class, artist)
+                    .getBody();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

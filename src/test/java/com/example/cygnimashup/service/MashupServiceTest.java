@@ -11,13 +11,22 @@ import com.example.cygnimashup.model.musicbrainz.MusicBrainzResponse;
 import com.example.cygnimashup.model.musicbrainz.Relation;
 import com.example.cygnimashup.model.musicbrainz.ReleaseGroup;
 import com.example.cygnimashup.model.musicbrainz.Url;
+import com.example.cygnimashup.model.wikidata.SiteLink;
+import com.example.cygnimashup.model.wikidata.Title;
+import com.example.cygnimashup.model.wikidata.WikidataEntity;
+import com.example.cygnimashup.model.wikidata.WikidataResponse;
+import com.example.cygnimashup.model.wikipedia.Page;
+import com.example.cygnimashup.model.wikipedia.WikipediaQuery;
+import com.example.cygnimashup.model.wikipedia.WikipediaResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -34,9 +43,11 @@ public class MashupServiceTest {
     @Mock
     WikipediaDao wikipediaDao;
 
+    private MashupService mashupService;
+
     @Before
     public void setUp() {
-
+        mashupService = new MashupService(musicBrainzDao, coverArtDao, wikipediaDao, wikidataDao);
     }
 
     @Test
@@ -69,8 +80,6 @@ public class MashupServiceTest {
 
     @Test
     public void shouldAddImageUrlToAlbums() {
-        MashupService mashupService = new MashupService(musicBrainzDao, coverArtDao, wikipediaDao, wikidataDao);
-
         List<Album> albums = new ArrayList<>();
         albums.add(new Album("111", "Greatest Hits vol.4", null));
 
@@ -97,8 +106,6 @@ public class MashupServiceTest {
 
     @Test
     public void shouldHandleNullWhenGettingCoverArt() {
-        MashupService mashupService = new MashupService(musicBrainzDao, coverArtDao, wikipediaDao, wikidataDao);
-
         List<Album> albums = new ArrayList<>();
         albums.add(new Album("111", "Greatest Hits vol.1", null));
 
@@ -112,8 +119,6 @@ public class MashupServiceTest {
 
     @Test
     public void shouldReturnNullWhenExtractingAlbumsFromEmptyMusicBrainzAlbumList() {
-        MashupService mashupService = new MashupService(musicBrainzDao, coverArtDao, wikipediaDao, wikidataDao);
-
         List<ReleaseGroup> releaseGroups = new ArrayList<>();
         MusicBrainzResponse musicBrainzResponse = new MusicBrainzResponse();
         musicBrainzResponse.setReleaseGroups(releaseGroups);
@@ -211,5 +216,68 @@ public class MashupServiceTest {
         String expected = "Q370293";
 
         assertEquals(expected, result);
+    }
+
+    @Test
+    public void shouldExtractWikipediaDescription() {
+        Page page = new Page();
+        page.setExtract("Description of a rockband...");
+
+        WikipediaQuery wikipediaQuery = new WikipediaQuery();
+        Map<Integer, Page> pages = new HashMap<>();
+        pages.put(111, page);
+        wikipediaQuery.setPages(pages);
+
+        WikipediaResponse wikipediaResponse = new WikipediaResponse();
+        wikipediaResponse.setQuery(wikipediaQuery);
+
+        String result = MashupService.extractWikipediaDescription(wikipediaResponse);
+        String expected = "Description of a rockband...";
+
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void shouldHandleExceptionWhenExtractingWikipediaDescription() {
+        String result1 = MashupService.extractWikipediaDescription(new WikipediaResponse());
+
+        WikipediaResponse wikipediaResponse = new WikipediaResponse();
+        wikipediaResponse.setQuery(new WikipediaQuery());
+
+        String result2 = MashupService.extractWikipediaDescription(wikipediaResponse);
+
+        assertNull(result1);
+        assertNull(result2);
+    }
+
+    @Test
+    public void shouldExtractArtistName() {
+        Title title = new Title();
+        title.setTitle("The_Beatles");
+
+        SiteLink siteLink = new SiteLink();
+        siteLink.setEnwiki(title);
+
+        WikidataEntity wikidataEntity = new WikidataEntity();
+        wikidataEntity.setSitelinks(siteLink);
+
+        Map<String, WikidataEntity> entities = new HashMap<>();
+        String wikidataId = "Q123456";
+        entities.put(wikidataId, wikidataEntity);
+
+        WikidataResponse wikidataResponse = new WikidataResponse();
+        wikidataResponse.setEntities(entities);
+
+        MusicBrainzResponse musicBrainzResponse = new MusicBrainzResponse();
+
+        String result = MashupService.extractArtistName(wikidataResponse, wikidataId);
+        String expected = "The_Beatles";
+
+        assertEquals(expected, result);
+    }
+    @Test
+    public void shouldHandleNullWhenExtractingArtistName() {
+        String result = MashupService.extractArtistName(null, null);
+        assertNull(result);
     }
 }
