@@ -247,9 +247,11 @@ public class MashupServiceTest {
         wikipediaResponse.setQuery(new WikipediaQuery());
 
         String result2 = MashupService.extractWikipediaDescription(wikipediaResponse);
+        String result3 = MashupService.extractWikipediaDescription(null);
 
         assertNull(result1);
         assertNull(result2);
+        assertNull(result3);
     }
 
     @Test
