@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 @Service
 public class MashupService {
 
-    static String WIKIPEDIA = "wikipedia";
-    static String WIKIDATA = "wikidata";
+    static final String WIKIPEDIA = "wikipedia";
+    static final String WIKIDATA = "wikidata";
 
     private static final Logger logger = LoggerFactory.getLogger(MashupService.class);
 
